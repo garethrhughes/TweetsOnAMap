@@ -75,9 +75,9 @@
       Clients.All.updateUserCount(_userCount);
     }
 
-      public void SendPostcode(int postcode, int size, int rating, double latitude, double longitude)
+      public void SendPostcode(int postcode, int size, double rating, double latitude, double longitude, string text, string screenName, string profileImageUrl)
       {
-          Clients.All.displayPostcode(postcode, size, rating, latitude, longitude);
+          Clients.All.displayPostcode(postcode, size, rating, latitude, longitude, text, screenName, profileImageUrl);
       }
   }
 }

@@ -22,11 +22,15 @@ namespace twangman.web.App_Start
     {
         private static readonly List<TwitterStatus> _allTweets = new List<TwitterStatus>();
 
+
+        private static IList<TweetData> Tweets { get; set; } 
+
         private static Task twitterTask;
 
         public static void Start ()
         {
-            twitterTask = new Task(FakeMain);
+            twitterTask = new Task(Main);
+            Tweets = new List<TweetData>();
             twitterTask.Start();
         }
 
@@ -34,10 +38,11 @@ namespace twangman.web.App_Start
         {
             var service = new TwitterService(Authentication.ConsumerKey, Authentication.ConsumerSecret);
             service.AuthenticateWith(Authentication.AccessToken, Authentication.AccessTokenSecret);
+            
 
-            _allTweets.AddRange(GetHistoricalTweets(service));
+            //_allTweets.AddRange(GetHistoricalTweets(service));
 
-            service.StreamUser((tweets, response) =>
+            service.StreamFilter((tweets, response) =>
             {
                 SaveTweet(service, tweets);
             });
@@ -46,9 +51,18 @@ namespace twangman.web.App_Start
 
         public static void FakeMain()
         {
-            var twitterStatus = new TwitterStatus();
+            var twitterStatus = new TwitterStatus
+                {
+                    User =
+                        new TwitterUser
+                            {
+                                ProfileImageUrl =
+                                    "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
+                                ScreenName = "Susan"
+                            }
+                };
+
             var rand = new Random();
-            
 
             for (int i = 0; i < 1000000; i++ )
             {
@@ -56,7 +70,7 @@ namespace twangman.web.App_Start
                 var randomRating = rand.Next(0, 10);
                 twitterStatus.Text = string.Format("{0} {1}/10 Testing", nextPostcode, randomRating);
                 ProcessText(twitterStatus);
-                twitterTask.Wait(500);
+                twitterTask.Wait(2000);
             }
         }
 
@@ -71,19 +85,26 @@ namespace twangman.web.App_Start
 
         private static void ProcessText(TwitterStatus status)
         {
-            _allTweets.Add(status);
-            var match = Regex.Match(status.Text, @"^([0-9]{3,4}) ([0-9]{1,2})\/10");
+            var match = Regex.Match(status.Text, @"^([0-9]{3,4}) ([0-9]{1,2})\/10 ([^$]+)");
             if (match.Success)
             {
                 var code = int.Parse(match.Groups[1].Value);
                 var rating = int.Parse(match.Groups[2].Value);
+                var text = match.Groups[3].Value;
                 if (rating > 10) rating = 10;
                 if (rating < 0) rating = 0;
-                var size = 20000;
 
                 var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
                 if(postcode != null)
-                    TwitterTicker.Instance.SendPostcode(code, size, rating, postcode.Latitude, postcode.Longitude);
+                {
+                    Tweets.Add(new TweetData { Code = code, Rating = rating, Tweet = status.Text });
+
+                    var size = Tweets.Count(x => x.Code == code);
+                    var averageRating = Tweets.Where(x => x.Code == code).Average(x => x.Rating);
+
+                    TwitterTicker.Instance.SendPostcode(
+                        code, size, averageRating, postcode.Latitude, postcode.Longitude, text, status.User.ScreenName, status.User.ProfileImageUrl);
+                }
             }
         }
 
@@ -94,11 +115,19 @@ namespace twangman.web.App_Start
 
             foreach (var tweet in tweets)
             {
-                //Console.WriteLine("{0} says '{1}'", tweet.User.ScreenName, tweet.Text);
                 list.Add(tweet);
             }
             list.Reverse();
             return list;
         }
+    }
+
+    internal class TweetData
+    {
+        public int Code { get; set; }
+
+        public int Rating { get; set; }
+
+        public string Tweet { get; set; }
     }
 }
