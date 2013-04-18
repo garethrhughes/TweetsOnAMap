@@ -8,7 +8,9 @@
     <head>
     <title>Maps Maps Maps!</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-   <link href="/css/bootstrap.css" type="text/css" rel="stylesheet"/>       
+   <link href="/css/bootstrap.css" type="text/css" rel="stylesheet"/>
+   
+    
         <style type="text/css">
             * { padding: 0; margin: 0; }
          html { height: 100% }
@@ -67,6 +69,37 @@
               position: fixed;
               top: 10px;
             }
+            
+            .info-window 
+            {
+              border-radius: 5px;
+            }
+            
+            .infobox-wrapper {
+                display:none;
+            }
+            .infobox-inner {
+                border:2px solid black;
+                margin-top: 8px;
+                background:#333;
+                color:#FFF;
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:12px;
+                padding: .5em 1em;
+                -webkit-border-radius: 2px;
+                -moz-border-radius: 2px;
+                border-radius: 2px;
+                text-shadow:0 -1px #000000;
+                -webkit-box-shadow: 0 0  8px #000;
+                box-shadow: 0 0 8px #000;
+                overflow: auto;
+            }
+
+            .infoBox > img 
+            {
+              left: -20px;
+            }
+
         </style>
 
 </head>
@@ -91,39 +124,7 @@
         </ul>
 
         <ul class="media-list right">
-          <li class="media navbar-inner">
-            <a class="pull-left" href="#">
-              <img class="media-object" src="http://placehold.it/64x64">
-            </a>
-            <div class="media-body">
-              Stuff and things happened today
-            </div>
-          </li>          
-          <li class="media navbar-inner">
-            <a class="pull-left" href="#">
-              <img class="media-object" src="http://placehold.it/64x64">
-            </a>
-            <div class="media-body">
-              Stuff and things happened today
-            </div>
-          </li>          
-          <li class="media navbar-inner">
-            <a class="pull-left" href="#">
-              <img class="media-object" src="http://placehold.it/64x64">
-            </a>
-            <div class="media-body">
-              Stuff and things happened today
-            </div>
-          </li>
-
-          <li class="media navbar-inner">
-            <a class="pull-left" href="#">
-              <img class="media-object" src="http://placehold.it/64x64">
-            </a>
-            <div class="media-body">
-              Stuff and things happened today
-            </div>
-          </li>
+     
         </ul>
 
 
@@ -143,6 +144,9 @@
         <script type="text/javascript"
           src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4OLXZzFfoqBbhseHYT1CMm5_wKegdGzE&sensor=false">
         </script>
+
+        <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+
         <script type="text/javascript">
             (function() {
                 function initialize() {
