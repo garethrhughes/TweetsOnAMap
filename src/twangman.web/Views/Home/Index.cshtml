@@ -41,7 +41,7 @@
               width: 300px;
             }
             
-            .media-list 
+            .media-list.right
             {
               position:absolute;
               right: 2%;
@@ -49,6 +49,13 @@
               width: 300px;
             }
             
+                  .media-list.left
+            {
+              position:absolute;
+              left: 2%;
+              bottom: 80px;
+              width: 300px;
+            }
             .media.navbar-inner
             {
               padding: 10px;
@@ -72,7 +79,7 @@
           Welcome to Maps! <button class="close pull-right">&times;</button>
         </div>
 
-        <ul class="media-list">
+        <ul class="media-list left">
           <li class="media navbar-inner">
             <a class="pull-left" href="#">
               <img class="media-object" src="http://placehold.it/64x64">
@@ -80,14 +87,27 @@
             <div class="media-body">
               Stuff and things happened today
             </div>
-          </li>          <li class="media navbar-inner">
+          </li>  
+        </ul>
+
+        <ul class="media-list right">
+          <li class="media navbar-inner">
             <a class="pull-left" href="#">
               <img class="media-object" src="http://placehold.it/64x64">
             </a>
             <div class="media-body">
               Stuff and things happened today
             </div>
-          </li>          <li class="media navbar-inner">
+          </li>          
+          <li class="media navbar-inner">
+            <a class="pull-left" href="#">
+              <img class="media-object" src="http://placehold.it/64x64">
+            </a>
+            <div class="media-body">
+              Stuff and things happened today
+            </div>
+          </li>          
+          <li class="media navbar-inner">
             <a class="pull-left" href="#">
               <img class="media-object" src="http://placehold.it/64x64">
             </a>
@@ -109,8 +129,8 @@
 
         <div class="navbar">
           <div class="navbar-inner">
-            <p class="pull-left">Active Viewers: <span id="data-loc"></span></p>
-            <p class="pull-right">Total Tweets: <span id="total-tweets"></span></p>
+            <p class="pull-left">Active Viewers: <span id="data-loc" class="badge badge-success">0</span> Total Tweets: <span class="badge badge-success" id="total-tweets">0</span></p>
+            <p class="pull-right"><a href="#">Sydney killer 'can't recall' fatal minutes</a></p>
           </div>
         </div>
 
