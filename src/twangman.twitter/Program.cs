@@ -1,54 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using TweetSharp;
-
-namespace twitter_hangman
+﻿namespace twangman.twitter
 {
+    using System;
+
+    using TweetSharp;
+
+    using System.Collections.Generic;
+
     class Program
     {
-        private const string _consumerKey = "";
-        private static string _consumerSecret = "";
-        private static string _accessToken = "";
-        private static string _accessTokenSecret = "";
+
+        private static List<TwitterStatus> _allTweets = new List<TwitterStatus>();
 
         static void Main(string[] args)
         {
-            var service = new TwitterService(_consumerKey, _consumerSecret);
-            service.AuthenticateWith(_accessToken, _accessTokenSecret);
+            var service = new TwitterService(Authentication.ConsumerKey, Authentication.ConsumerSecret);
+            service.AuthenticateWith(Authentication.AccessToken, Authentication.AccessTokenSecret);
 
-           
+            _allTweets.AddRange(GetHistoricalTweets(service));
 
-            
-            IAsyncResult result = service.StreamUser(
+            service.StreamUser(
                 (tweets, response) =>
                     {
-                        //if (response.StatusCode == HttpStatusCode.OK)
                         {
-                            Console.WriteLine(response);
-                            Console.WriteLine(tweets.RawSource);
-
-                            //foreach (var tweet in tweets)
-                            //{
-                            //    Console.WriteLine("{0} said '{1}'", tweet.User.ScreenName, tweet.Text);
-                            //}
+                            var status = service.Deserialize<TwitterStatus>(tweets);
+                            Program._allTweets.Add(status);
+                            Console.WriteLine(status.Text);
                         }
                     });
 
-            Console.WriteLine(result.AsyncState);
-
-            //var tweets = service.ListTweetsOnHomeTimeline(new ListTweetsOnHomeTimelineOptions());
-   
-            //foreach (var tweet in tweets)
-            //{
-            //    Console.WriteLine("{0} says '{1}'", tweet.User.ScreenName, tweet.Text);
-            //}
-            
             Console.ReadLine();
             service.CancelStreaming();
+        }
+
+        private static List<TwitterStatus> GetHistoricalTweets(TwitterService service)
+        {
+            var list = new List<TwitterStatus>();
+            var tweets = service.ListTweetsOnHomeTimeline(new ListTweetsOnHomeTimelineOptions());
+
+            foreach (var tweet in tweets)
+            {
+                Console.WriteLine("{0} says '{1}'", tweet.User.ScreenName, tweet.Text);
+                list.Add(tweet);
+            }
+            return list;
         }
     }
 }
