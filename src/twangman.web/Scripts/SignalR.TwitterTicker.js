@@ -34,12 +34,24 @@ $(function () {
     updateUserCount: function (users) {
       $('#data-loc').html(users);
     },
+    displayAccountTweet: function (text, screenName, profileImageUrl) {
+
+      var toast = $(twitterTemplate.replace(/{imgUrl}/, profileImageUrl).replace(/{name}/, screenName).replace(/{tweet}/, text));
+      $('.media-list.left').prepend(toast);
+      setTimeout(function () {
+        toast.fadeOut(function () {
+          toast.remove();
+        });
+      }, 30000);
+    },
     displayPostcode: function (postcode, size, rating, lat, lng, text, screenName, profileImageUrl) {
       var toast = $(twitterTemplate.replace(/{imgUrl}/, profileImageUrl).replace(/{name}/, screenName).replace(/{tweet}/, text));
       $('.media-list.right').prepend(toast);
       setTimeout(function () {
-        toast.fadeOut('fast');
-      }, 10000);
+        toast.fadeOut(function () {
+          toast.remove();
+        });
+      }, 11000);
 
       var colour = colourMagic(rating);
       if (areas[postcode] == null) {
