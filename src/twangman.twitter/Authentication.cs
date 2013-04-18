@@ -2,9 +2,9 @@ namespace twangman.twitter
 {
     public class Authentication
     {
-        public const string ConsumerKey = "E0FykBcLn54TxsQpGGrCrA";
-        public const string ConsumerSecret = "tTZGBemCVKZhRpkMBhfyMpNG9hj8zcI1s2ta8X9H8";
-        public const string AccessToken = "1346769720-J8fhG30WesfDdCRoxC27Oxrq5yaOCwSsubFLMSu";
-        public const string AccessTokenSecret = "r75E2bWJppS49cgdd6CRj4R6QoEcw2vbr6nwfgm1sI";
+      public const string ConsumerKey = "VRkussKWGMWGOGO7A1daw";
+      public const string ConsumerSecret = "RwERvZi5Lyvhy9lv3QtCPtUE1QBjKo72fM06AnOt5k";
+      public const string AccessToken = "23573011-yuRLdBDvRLU35jqH4nEkwjQ8U67pXVAMy98DEcPI";
+      public const string AccessTokenSecret = "ky1PjZcc8SE4hVku9tfTLy8mi8yNWOffk9xx8EkipKo";
     }
 }

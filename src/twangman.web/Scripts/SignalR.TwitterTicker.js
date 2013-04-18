@@ -73,7 +73,4 @@ $(function () {
 
     });
 
-    window.onbeforeunload = function () {
-
-    };
 });
