@@ -6,23 +6,23 @@ $(function () {
 
   var init = function () {
     ticker.server.getUserCount().done(function (users) {
-
+      $('#data-loc').html(users);
     });
   };
 
   $.extend(ticker.client, {
-    updateUserCount: function (int) {
-      $('#data-loc').html(int);
+    updateUserCount: function (users) {
+      $('#data-loc').html(users);
     }
   });
 
   $.connection.hub.start()
     .pipe(init)
     .done(function () {
-      ticker.server.startSession();
+
     });
 
   window.onbeforeunload = function () {
-    ticker.server.endSession();
+
   };
 });

@@ -1,6 +1,7 @@
 ﻿namespace twangman.web.Hubs
 {
   using System;
+  using System.Threading.Tasks;
   using Microsoft.AspNet.SignalR;
   using Microsoft.AspNet.SignalR.Hubs;
 
@@ -23,14 +24,18 @@
       return _twitterTicker.UserCount;
     }
 
-    public void StartSession()
+    public override Task OnConnected()
     {
       _twitterTicker.IncreaseUsers();
+
+      return Clients.All.joined(Context.ConnectionId, DateTime.Now.ToString());
     }
 
-    public void EndSession()
+    public override Task OnDisconnected()
     {
       _twitterTicker.DecreaseUsers();
+
+      return Clients.All.leave(Context.ConnectionId, DateTime.Now.ToString());
     }
   }
 
