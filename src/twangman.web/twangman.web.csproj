@@ -41,6 +41,9 @@
     <Reference Include="CsvHelper">
       <HintPath>..\packages\CsvHelper.1.17.0\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="dotless.Core">
+      <HintPath>..\packages\dotless.1.2.4.0\lib\dotless.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Hammock.ClientProfile">
       <HintPath>..\packages\Hammock.1.3.1\lib\4.0\Hammock.ClientProfile.dll</HintPath>
     </Reference>
@@ -153,6 +156,20 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Global.asax" />
+    <Content Include="Images\glyphicons-halflings-white.png" />
+    <Content Include="Images\glyphicons-halflings.png" />
+    <Content Include="Scripts\bootstrap-alert.js" />
+    <Content Include="Scripts\bootstrap-button.js" />
+    <Content Include="Scripts\bootstrap-carousel.js" />
+    <Content Include="Scripts\bootstrap-collapse.js" />
+    <Content Include="Scripts\bootstrap-dropdown.js" />
+    <Content Include="Scripts\bootstrap-modal.js" />
+    <Content Include="Scripts\bootstrap-popover.js" />
+    <Content Include="Scripts\bootstrap-scrollspy.js" />
+    <Content Include="Scripts\bootstrap-tab.js" />
+    <Content Include="Scripts\bootstrap-tooltip.js" />
+    <Content Include="Scripts\bootstrap-transition.js" />
+    <Content Include="Scripts\bootstrap-typeahead.js" />
     <Content Include="Scripts\jquery-1.9.1-vsdoc.js" />
     <Content Include="Scripts\jquery-1.9.1.js" />
     <Content Include="Scripts\jquery-1.9.1.min.js" />
@@ -180,6 +197,41 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\Stylesheets\bootstrap\accordion.less" />
+    <None Include="Content\Stylesheets\bootstrap\alerts.less" />
+    <None Include="Content\Stylesheets\bootstrap\bootstrap.less" />
+    <None Include="Content\Stylesheets\bootstrap\breadcrumbs.less" />
+    <None Include="Content\Stylesheets\bootstrap\button-groups.less" />
+    <None Include="Content\Stylesheets\bootstrap\buttons.less" />
+    <None Include="Content\Stylesheets\bootstrap\carousel.less" />
+    <None Include="Content\Stylesheets\bootstrap\close.less" />
+    <None Include="Content\Stylesheets\bootstrap\code.less" />
+    <None Include="Content\Stylesheets\bootstrap\component-animations.less" />
+    <None Include="Content\Stylesheets\bootstrap\dropdowns.less" />
+    <None Include="Content\Stylesheets\bootstrap\forms.less" />
+    <None Include="Content\Stylesheets\bootstrap\grid.less" />
+    <None Include="Content\Stylesheets\bootstrap\hero-unit.less" />
+    <None Include="Content\Stylesheets\bootstrap\labels.less" />
+    <None Include="Content\Stylesheets\bootstrap\layouts.less" />
+    <None Include="Content\Stylesheets\bootstrap\mixins.less" />
+    <None Include="Content\Stylesheets\bootstrap\modals.less" />
+    <None Include="Content\Stylesheets\bootstrap\navbar.less" />
+    <None Include="Content\Stylesheets\bootstrap\navs.less" />
+    <None Include="Content\Stylesheets\bootstrap\pager.less" />
+    <None Include="Content\Stylesheets\bootstrap\pagination.less" />
+    <None Include="Content\Stylesheets\bootstrap\popovers.less" />
+    <None Include="Content\Stylesheets\bootstrap\progress-bars.less" />
+    <None Include="Content\Stylesheets\bootstrap\reset.less" />
+    <None Include="Content\Stylesheets\bootstrap\responsive.less" />
+    <None Include="Content\Stylesheets\bootstrap\scaffolding.less" />
+    <None Include="Content\Stylesheets\bootstrap\sprites.less" />
+    <None Include="Content\Stylesheets\bootstrap\tables.less" />
+    <None Include="Content\Stylesheets\bootstrap\thumbnails.less" />
+    <None Include="Content\Stylesheets\bootstrap\tooltip.less" />
+    <None Include="Content\Stylesheets\bootstrap\type.less" />
+    <None Include="Content\Stylesheets\bootstrap\utilities.less" />
+    <None Include="Content\Stylesheets\bootstrap\variables.less" />
+    <None Include="Content\Stylesheets\bootstrap\wells.less" />
     <None Include="postcode.csv" />
     <None Include="Scripts\jquery-1.9.1.min.map" />
     <Content Include="Views\Home\Index.cshtml" />

@@ -29,7 +29,7 @@ namespace twangman.web.App_Start
 
         public static void Start ()
         {
-            twitterTask = new Task(Main);
+            twitterTask = new Task(FakeMain);
             Tweets = new List<TweetData>();
             twitterTask.Start();
         }
@@ -42,9 +42,12 @@ namespace twangman.web.App_Start
 
             //_allTweets.AddRange(GetHistoricalTweets(service));
 
-            service.StreamFilter((tweets, response) =>
+            service.StreamUser((tweets, response) =>
             {
+              if (tweets != null)
+              {
                 SaveTweet(service, tweets);
+              }
             });
 
         }
@@ -70,7 +73,7 @@ namespace twangman.web.App_Start
                 var randomRating = rand.Next(0, 10);
                 twitterStatus.Text = string.Format("{0} {1}/10 Testing", nextPostcode, randomRating);
                 ProcessText(twitterStatus);
-                twitterTask.Wait(2000);
+                twitterTask.Wait(5000);
             }
         }
 
