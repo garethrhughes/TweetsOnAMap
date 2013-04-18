@@ -61,7 +61,7 @@ namespace TweetSharp
 #if !WINDOWS_PHONE
             return 
 #endif
-            WithHammockUserStreaming(options, action, "user.json");
+            WithHammockUserStreaming(options, action, "user.json?replies=all");
         }
 
 #if !WINDOWS_PHONE
@@ -74,7 +74,7 @@ namespace TweetSharp
 #if !WINDOWS_PHONE
             return 
 #endif 
-            WithHammockStreamingImpl(_userStreamsClient, request, options, action);
+            WithHammockStreamingImpl(_userStreamsClient, request, options, action, WebMethod.Get);
         }
 
         #if !WINDOWS_PHONE
@@ -87,17 +87,17 @@ namespace TweetSharp
 #if !WINDOWS_PHONE
             return 
 #endif 
-            WithHammockStreamingImpl(_publicStreamsClient, request, options, action);
+            WithHammockStreamingImpl(_publicStreamsClient, request, options, action, WebMethod.Post);
         }
 
 #if !WINDOWS_PHONE
-        private IAsyncResult WithHammockStreamingImpl<T>(RestClient client, RestRequest request, StreamOptions options, Action<T, TwitterResponse> action)
+        private IAsyncResult WithHammockStreamingImpl<T>(RestClient client, RestRequest request, StreamOptions options, Action<T, TwitterResponse> action, WebMethod httpMethod)
 #else
         private static void WithHammockStreamingImpl<T>(RestClient client, RestRequest request, StreamOptions options, Action<T, TwitterResponse> action)
 #endif
         {
             request.StreamOptions = options;
-            request.Method = WebMethod.Get;
+            request.Method = httpMethod;
 #if SILVERLIGHT
             request.AddHeader("X-User-Agent", client.UserAgent); 
 #endif
@@ -111,7 +111,7 @@ namespace TweetSharp
                 var entity = TryAsyncResponse(() => 
                         {
 #if !SILVERLIGHT
-                            SetResponse(resp);
+                            this.SetResponse(resp);
 #endif
                             var deserializer = new JsonSerializer();
                             return deserializer.DeserializeJson<T>(resp.Content);
