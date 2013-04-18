@@ -74,5 +74,10 @@
       _userCount += 1;
       Clients.All.updateUserCount(_userCount);
     }
+
+      public void SendPostcode(int postcode, int size, int rating, double latitude, double longitude)
+      {
+          Clients.All.displayPostcode(postcode, size, rating, latitude, longitude);
+      }
   }
 }

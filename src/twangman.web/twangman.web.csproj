@@ -41,6 +41,9 @@
     <Reference Include="CsvHelper">
       <HintPath>..\packages\CsvHelper.1.17.0\lib\net40-client\CsvHelper.dll</HintPath>
     </Reference>
+    <Reference Include="Hammock.ClientProfile">
+      <HintPath>..\packages\Hammock.1.3.1\lib\4.0\Hammock.ClientProfile.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNet.SignalR.Core">
       <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.1.0.1\lib\net40\Microsoft.AspNet.SignalR.Core.dll</HintPath>
     </Reference>
@@ -136,6 +139,8 @@
   <ItemGroup>
     <Compile Include="App_Start\PostcodeLoader.cs" />
     <Compile Include="App_Start\RegisterHubs.cs" />
+    <Compile Include="App_Start\TwitterClient.cs" />
+    <Compile Include="Authentication.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -178,6 +183,16 @@
     <None Include="postcode.csv" />
     <None Include="Scripts\jquery-1.9.1.min.map" />
     <Content Include="Views\Home\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\twangman.twitter\twangman.twitter.csproj">
+      <Project>{ED398BF3-12B5-4FFC-9A2B-A9860308C4A2}</Project>
+      <Name>twangman.twitter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TweetSharp\TweetSharp.csproj">
+      <Project>{10BFAA13-B836-4B37-B2D3-D4FEB3F3C484}</Project>
+      <Name>TweetSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

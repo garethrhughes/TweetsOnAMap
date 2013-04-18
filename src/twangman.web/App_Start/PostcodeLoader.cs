@@ -6,6 +6,7 @@ namespace twangman.web.App_Start
 {
   using System.Collections.Generic;
   using System.IO;
+  using System.Linq;
   using System.Web.Hosting;
   using CsvHelper;
 
@@ -16,7 +17,7 @@ namespace twangman.web.App_Start
     {
       var path = HostingEnvironment.MapPath("~/postcode.csv");
       var csv = new CsvReader(new StreamReader(path));
-      Postcodes = csv.GetRecords<Postcode>();
+      Postcodes = csv.GetRecords<Postcode>().ToList();
     }
   }
 
