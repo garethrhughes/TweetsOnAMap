@@ -15,20 +15,12 @@
 
             _allTweets.AddRange(GetHistoricalTweets(service));
 
-            //service.StreamFilter(
-            //    (tweets, response) =>
-            //        {
-            //            if (tweets != null)
-            //            {
-            //                SaveTweet(service, tweets);
-            //            }
-            //        });
             service.StreamUser((tweets, response) =>
                 {
-                  if (tweets != null)
-                  {
-                    SaveTweet(service, tweets);
-                  }
+                    if (tweets != null)
+                    {
+                        SaveTweet(service, tweets);
+                    }
                 });
 
             Console.ReadLine();
