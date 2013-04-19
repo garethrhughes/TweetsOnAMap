@@ -27,7 +27,7 @@ namespace twangman.web.App_Start
 
         public static void Start ()
         {
-            twitterTask = new Task(FakeMain);
+            twitterTask = new Task(Main);
             AllTweets = new List<TweetData>();
             twitterTask.Start();
         }
@@ -103,12 +103,11 @@ namespace twangman.web.App_Start
 
         private static void ProcessPostcodeTweet(TwitterStatus status)
         {
-            var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([0-9]{1,2})\/10 ([^$]+)", RegexOptions.IgnoreCase);
+            var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([0-9]{1,2})\/10", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 var code = int.Parse(match.Groups[1].Value);
                 var rating = int.Parse(match.Groups[2].Value);
-                var text = match.Groups[3].Value;
                 if (rating > 10) rating = 10;
                 if (rating < 1) rating = 1;
 
@@ -122,7 +121,7 @@ namespace twangman.web.App_Start
                     var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
 
                     TwitterTicker.Instance.SendPostcode(
-                        code, size, averageRating, postcode.Latitude, postcode.Longitude, text, status.User.ScreenName, status.User.ProfileImageUrl, AllTweets.Count());
+                        code, size, averageRating, postcode.Latitude, postcode.Longitude, status.Text, status.User.ScreenName, status.User.ProfileImageUrl, AllTweets.Count());
                 }
             }
         }
