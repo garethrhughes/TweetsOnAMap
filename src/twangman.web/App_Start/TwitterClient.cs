@@ -78,8 +78,11 @@ namespace twangman.web.App_Start
                 var randomRating = rand.Next(0, 10);
                 twitterStatus.Text = string.Format("@tweetsonamap {0} {1}/10 Testing", nextPostcode, randomRating);
                 ProcessPostcodeTweet(twitterStatus);
-                //ProcessAccountTweet(accountStatus);
-                twitterTask.Wait(1000);
+                
+                if(i % 10 == 0)
+                    ProcessAccountTweet(accountStatus);
+
+                twitterTask.Wait(2000);
             }
         }
 
