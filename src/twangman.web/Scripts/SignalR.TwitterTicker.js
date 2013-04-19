@@ -16,13 +16,13 @@ $(function () {
         switch (parseInt(i)) {
             case 0:
             case 1:
-                return rgbToHex(255, 0, 0); 
+                return rgbToHex(255, 0, 0);
             case 2:
                 return rgbToHex(255, 50, 0);
             case 3:
-                return rgbToHex(255, 100, 0); 
+                return rgbToHex(255, 100, 0);
             case 4:
-                return rgbToHex(255, 150, 0); 
+                return rgbToHex(255, 150, 0);
             case 5:
                 return rgbToHex(255, 200, 0);
             case 6:
@@ -32,9 +32,9 @@ $(function () {
             case 8:
                 return rgbToHex(100, 255, 0);
             case 9:
-                return rgbToHex(50, 255, 0); 
+                return rgbToHex(50, 255, 0);
             case 10:
-                return rgbToHex(0, 255, 0); 
+                return rgbToHex(0, 255, 0);
         }
     };
 
@@ -69,7 +69,8 @@ $(function () {
                 });
             }, 180000);
         },
-        displayPostcode: function (postcode, size, rating, lat, lng, text, screenName, profileImageUrl, count) {
+        displayPostcode: function (postcodeObj, size, rating, lat, lng, text, screenName, profileImageUrl, count) {
+            var postcode = postcodeObj.Code;
             $("#total-tweets").html(count);
             var toast = $(twitterTemplate.replace(/{imgUrl}/, profileImageUrl).replace(/{name}/, screenName).replace(/{tweet}/, text));
             toast.find('.close').click(function () {
@@ -95,44 +96,30 @@ $(function () {
                     fillOpacity: 0.6,
                     map: map,
                     center: new google.maps.LatLng(lat, lng),
-                    radius: size * 100
+                    radius: size * 100,
+                    clickable: true
                 };
 
                 areas[postcode] = new google.maps.Circle(populationOptions);
+
+                google.maps.event.addListener(areas[postcode], 'click', function (ev) {
+
+                    ticker.server.getPostcodeInfo(postcode).done(function (message) {
+                        var clickBox = createBox(message);
+                        clickBox.open(map, {
+                            getPosition: function () {
+                                return new google.maps.LatLng(lat, lng);
+                            }
+                        });
+                    });
+
+                });
+
             } else {
                 areas[postcode].setOptions({ radius: size * 100, strokeColor: '#000000', fillColor: colour });
             }
 
-            var infobox = new InfoBox({
-                content: "<div class='infobox-inner'><img style='display: inline; float: left;' src='" + profileImageUrl + "' /><div style=' width: 230px; padding-left: 10px;display: inline-block;float: left;'>@" + screenName + "<br />" + text + "</div></div>",
-                disableAutoPan: true,
-                maxWidth: 350,
-                pixelOffset: new google.maps.Size(-140, 0),
-                zIndex: null,
-                boxStyle: {
-                    background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif') no-repeat",
-                    opacity: 0.75,
-                    width: "350px"
-                },
-                closeBoxMargin: "12px 4px 2px 2px",
-                closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
-                infoBoxClearance: new google.maps.Size(1, 1)
-            });
-
-            var oldDraw = infobox.draw;
-            infobox.draw = function () {
-                oldDraw.apply(this);
-                jQuery(infobox.div_).hide();
-                jQuery(infobox.div_).fadeIn();
-            }
-
-            var oldClose = infobox.close;
-            infobox.close = function () {
-                jQuery(infobox.div_).fadeOut(function () {
-                    jQuery(infobox.div_).hide();
-                    oldClose.apply(this);
-                });
-            }
+            var infobox = createBox("<img style='display: inline; float: left;' src='" + profileImageUrl + "' /><div style=' width: 230px; padding-left: 10px;display: inline-block;float: left;'>@" + screenName + "<br />" + text + "</div>");
 
             infobox.open(map, {
                 getPosition: function () {
@@ -149,7 +136,41 @@ $(function () {
     $.connection.hub.start()
     .pipe(init)
     .done(function () {
-
     });
 
+    var createBox = function (content) {
+        var infobox = new InfoBox({
+            content: "<div class='infobox-inner'>" + content + "</div>",
+            disableAutoPan: true,
+            maxWidth: 350,
+            pixelOffset: new google.maps.Size(-140, 0),
+            zIndex: null,
+            boxStyle: {
+                background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif') no-repeat",
+                opacity: 0.75,
+                width: "350px"
+            },
+            closeBoxMargin: "12px 4px 2px 2px",
+            closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+            infoBoxClearance: new google.maps.Size(1, 1)
+        });
+
+        var oldDraw = infobox.draw;
+        infobox.draw = function () {
+            oldDraw.apply(this);
+            jQuery(infobox.div_).hide();
+            jQuery(infobox.div_).fadeIn();
+        };
+
+        var oldClose = infobox.close;
+        infobox.close = function () {
+            jQuery(infobox.div_).fadeOut(function () {
+                jQuery(infobox.div_).hide();
+                oldClose.apply(this);
+            });
+
+        };
+
+        return infobox;
+    }
 });

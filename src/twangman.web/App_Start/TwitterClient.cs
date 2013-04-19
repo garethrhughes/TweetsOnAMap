@@ -20,15 +20,14 @@ namespace twangman.web.App_Start
 
     public class TwitterClient
     {
-        private static IList<TweetData> AllTweets { get; set; }
+        
         private static string ScreenName = "TweetsOnAMap";
         private static Task twitterTask;
 
 
         public static void Start ()
         {
-            twitterTask = new Task(Main);
-            AllTweets = new List<TweetData>();
+            twitterTask = new Task(FakeMain);
             twitterTask.Start();
         }
 
@@ -103,31 +102,12 @@ namespace twangman.web.App_Start
 
         private static void ProcessPostcodeTweet(TwitterStatus status)
         {
-            var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([0-9]{1,2})\/10", RegexOptions.IgnoreCase);
-            if (match.Success)
-            {
-                var code = int.Parse(match.Groups[1].Value);
-                var rating = int.Parse(match.Groups[2].Value);
-                if (rating > 10) rating = 10;
-                if (rating < 1) rating = 1;
-
-                var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
-                
-                if(postcode != null)
-                {
-                    AllTweets.Add(new TweetData { Code = code, Rating = rating, Tweet = status.Text });
-
-                    var size = AllTweets.Count(x => x.Code == code);
-                    var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
-
-                    TwitterTicker.Instance.SendPostcode(
-                        code, size, averageRating, postcode.Latitude, postcode.Longitude, status.Text, status.User.ScreenName, status.User.ProfileImageUrl, AllTweets.Count());
-                }
-            }
+            
+            TwitterTicker.Instance.SendPostcode(status);
         }
     }
 
-    internal class TweetData
+    public class TweetData
     {
         public int Code { get; set; }
 

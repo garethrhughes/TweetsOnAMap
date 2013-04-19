@@ -3,11 +3,16 @@
   using System;
   using System.Collections.Generic;
   using System.Linq;
+  using System.Text.RegularExpressions;
   using System.Threading.Tasks;
   using Microsoft.AspNet.SignalR;
   using Microsoft.AspNet.SignalR.Hubs;
 
-  [HubName("twitterTicker")]
+  using TweetSharp;
+
+  using twangman.web.App_Start;
+
+    [HubName("twitterTicker")]
   public class TwitterHub : Hub
   {
     private readonly TwitterTicker _twitterTicker;
@@ -24,6 +29,11 @@
     public int GetUserCount()
     {
       return _twitterTicker.UserCount;
+    }
+
+    public string GetPostcodeInfo(string postcode)
+    {
+        return _twitterTicker.DisplayInfo(postcode);
     }
 
     public override Task OnConnected()
@@ -46,10 +56,12 @@
     private static readonly Lazy<TwitterTicker> _instance = new Lazy<TwitterTicker>(
       () => new TwitterTicker(GlobalHost.ConnectionManager.GetHubContext<TwitterHub>().Clients));
 
-    
+    public static IList<TweetData> AllTweets { get; set; }
+
     private TwitterTicker(IHubConnectionContext clients)
     {
       ClientIDs = new List<string>();
+        AllTweets = new List<TweetData>();
       Clients = clients;
     }
 
@@ -83,14 +95,49 @@
       Clients.All.updateUserCount(UserCount);
     }
 
-      public void SendPostcode(int postcode, int size, double rating, double latitude, double longitude, string text, string screenName, string profileImageUrl, int count)
-      {
-          Clients.All.displayPostcode(postcode, size, rating, latitude, longitude, text, screenName, profileImageUrl, count);
-      }
+    public void SendPostcode(TwitterStatus status)
+    {
+        var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([0-9]{1,2})\/10", RegexOptions.IgnoreCase);
+        if (match.Success)
+        {
+            var code = int.Parse(match.Groups[1].Value);
+            var rating = int.Parse(match.Groups[2].Value);
+            if (rating > 10) rating = 10;
+            if (rating < 1) rating = 1;
+
+            var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
+
+            if (postcode != null)
+            {
+                AllTweets.Add(new TweetData { Code = code, Rating = rating, Tweet = status.Text });
+
+                var size = AllTweets.Count(x => x.Code == code);
+                var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
+
+                Clients.All.displayPostcode(
+                    postcode,
+                    size,
+                    averageRating,
+                    postcode.Latitude,
+                    postcode.Longitude,
+                    status.Text,
+                    status.User.ScreenName,
+                    status.User.ProfileImageUrl,
+                    AllTweets.Count);
+            }
+        }
+    }
 
       public void SendAccountTweet(string text, string screenName, string profileImageUrl)
       {
           Clients.All.displayAccountTweet(text, screenName, profileImageUrl);
+      }
+
+      public string DisplayInfo(string code)
+      {
+          var i = int.Parse(code);
+          var postcode =  PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == i);
+          return string.Format("{0}, {1}<br />Total Tweets: {2}, Average Rating: {3}", postcode.Area, code, AllTweets.Count(x => x.Code == i), AllTweets.Where(x => x.Code == i).Average(x => x.Rating).ToString("0,0.00"));
       }
   }
 }
