@@ -20,17 +20,14 @@ namespace twangman.web.App_Start
 
     public class TwitterClient
     {
-        private static readonly List<TwitterStatus> _allTweets = new List<TwitterStatus>();
-
-
-        private static IList<TweetData> Tweets { get; set; } 
+        private static IList<TweetData> AllTweets { get; set; } 
 
         private static Task twitterTask;
 
         public static void Start ()
         {
-            twitterTask = new Task(FakeMain);
-            Tweets = new List<TweetData>();
+            twitterTask = new Task(Main);
+            AllTweets = new List<TweetData>();
             twitterTask.Start();
         }
 
@@ -39,8 +36,6 @@ namespace twangman.web.App_Start
             var service = new TwitterService(Authentication.ConsumerKey, Authentication.ConsumerSecret);
             service.AuthenticateWith(Authentication.AccessToken, Authentication.AccessTokenSecret);
             
-
-            //_allTweets.AddRange(GetHistoricalTweets(service));
 
             service.StreamUser((tweets, response) =>
             {
@@ -65,6 +60,16 @@ namespace twangman.web.App_Start
                             }
                 };
 
+            var accountStatus = new TwitterStatus
+            {
+                User = new TwitterUser
+                    {
+                        ProfileImageUrl = "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
+                        ScreenName = "TweetsOnAMap"
+                    },
+                Text = "Something"
+            };
+
             var rand = new Random();
 
             for (int i = 0; i < 1000000; i++ )
@@ -72,7 +77,8 @@ namespace twangman.web.App_Start
                 int nextPostcode = rand.Next(2000, 2100);
                 var randomRating = rand.Next(0, 10);
                 twitterStatus.Text = string.Format("{0} {1}/10 Testing", nextPostcode, randomRating);
-                ProcessText(twitterStatus);
+                ProcessPostcodeTweet(twitterStatus);
+                ProcessAccountTweet(accountStatus);
                 twitterTask.Wait(5000);
             }
         }
@@ -82,13 +88,21 @@ namespace twangman.web.App_Start
             var status = service.Deserialize<TwitterStatus>(tweets);
             if (status.User != null)
             {
-                ProcessText(status);
-            }
+                if (status.User.ScreenName == "TweetsOnAMap") 
+                    ProcessAccountTweet(status);
+                else
+                    ProcessPostcodeTweet(status);
+            }   
         }
 
-        private static void ProcessText(TwitterStatus status)
+        private static void ProcessAccountTweet(TwitterStatus status)
         {
-            var match = Regex.Match(status.Text, @"^([0-9]{3,4}) ([0-9]{1,2})\/10 ([^$]+)");
+            TwitterTicker.Instance.SendAccountTweet(status.Text, status.User.ScreenName, status.User.ProfileImageUrl);
+        }
+
+        private static void ProcessPostcodeTweet(TwitterStatus status)
+        {
+            var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([0-9]{1,2})\/10 ([^$]+)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 var code = int.Parse(match.Groups[1].Value);
@@ -98,30 +112,18 @@ namespace twangman.web.App_Start
                 if (rating < 0) rating = 0;
 
                 var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
+                
                 if(postcode != null)
                 {
-                    Tweets.Add(new TweetData { Code = code, Rating = rating, Tweet = status.Text });
+                    AllTweets.Add(new TweetData { Code = code, Rating = rating, Tweet = status.Text });
 
-                    var size = Tweets.Count(x => x.Code == code);
-                    var averageRating = Tweets.Where(x => x.Code == code).Average(x => x.Rating);
+                    var size = AllTweets.Count(x => x.Code == code);
+                    var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
 
                     TwitterTicker.Instance.SendPostcode(
-                        code, size, averageRating, postcode.Latitude, postcode.Longitude, text, status.User.ScreenName, status.User.ProfileImageUrl);
+                        code, size, averageRating, postcode.Latitude, postcode.Longitude, text, status.User.ScreenName, status.User.ProfileImageUrl, AllTweets.Count());
                 }
             }
-        }
-
-        private static List<TwitterStatus> GetHistoricalTweets(TwitterService service)
-        {
-            var list = new List<TwitterStatus>();
-            var tweets = service.ListTweetsOnHomeTimeline(new ListTweetsOnHomeTimelineOptions());
-
-            foreach (var tweet in tweets)
-            {
-                list.Add(tweet);
-            }
-            list.Reverse();
-            return list;
         }
     }
 
