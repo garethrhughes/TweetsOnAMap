@@ -27,7 +27,7 @@ namespace twangman.web.App_Start
 
         public static void Start ()
         {
-            twitterTask = new Task(FakeMain);
+            twitterTask = new Task(Main);
             twitterTask.Start();
         }
 
