@@ -9,7 +9,9 @@
     <title>@@TweetsOnAMap</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
    <link href="/css/bootstrap.css" type="text/css" rel="stylesheet"/>
-   
+   <link rel="icon" 
+      type="image/png" 
+      href="https://si0.twimg.com/profile_images/3541063034/7b20c1d2d0cb80a94d464e44070fff2d_bigger.png" />
     
         <style type="text/css">
             * { padding: 0; margin: 0; }
@@ -39,8 +41,8 @@
               position: fixed;
               top: 20px;
               left: 50%;
-              margin-left: -150px;
-              width: 300px;
+              margin-left: -200px;
+              width: 349px;
             }
             
             .media-list.right
@@ -106,7 +108,60 @@
               right: 2%;
               top: 20px;
             }
+            
+            .tweet 
+            {
+              position: fixed;
+              top: 280px;
+              right: 2%;
+              margin-left: -175px;
+              width: 300px;
+              background-color: #fff;
+              color: #666;
 
+              border-radius: 5px;
+            }
+            
+            .tweet .profile-image {
+left: 10px;
+position: absolute;
+top: 10px;
+}
+.tweet .profile-image img {
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+border-radius: 3px;
+height: 32px;
+width: 32px;
+}
+
+.tweet .text {
+padding: 0 10px 5px 52px;
+}
+
+         .tweet .from {
+line-height: 1em;
+padding: 10px 10px 5px 52px;
+width: 250px;
+}   
+.tweet .from-user-name {
+color: #666;
+font-weight: bold;
+text-decoration: none;
+white-space: nowrap;
+}
+
+.tweet .from-user {
+color: #999;
+font-size: .8em;
+white-space: nowrap;
+}
+.tweet .meta {
+color: #999;
+font-size: .825em;
+line-height: 1em;
+padding: 0 5px 10px 52px;
+}
         </style>
 
 </head>
@@ -129,6 +184,12 @@
 
         <div id="ad"><div style="position: relative; width: 300px; height: 250px;"><object type="application/x-shockwave-flash" data="http://s0.2mdn.net/ads/richmedia/studio/5137851/23542767_20130405020528754_HBR1046_Barina_siri_100k_300x250_Parent.swf" width="300" height="250" wmode="opaque" flashvars="varName=200_19_flash_inpage_0&amp;creativeId=1365392794098_0&amp;assetId=23595414&amp;renderingType=200_19&amp;assetType=Inpage&amp;layoutsConfig=&amp;click=http%3A%2F%2Fwrapper.g.msn.com%2FGRedirect.aspx%3Fg.msn.com%2F2AD000AZ%2F53000000000136638.1%3F%21%26%26PID%3D10888701%26UIT%3DA%26TargetID%3D43195487%26N%3D1259405582%26PG%3DAUHRAI%26ASID%3D159c24b45a7a4a5791aed96a278055bb%26destination%3Dhttp%3A%2F%2Fad.au.doubleclick.net%2F6k%253Bh%253Dv8%2F3dc9%2F17%2Fc0%2F%252a%2Fi%253B270813777%253B0-0%253B0%253B97160274%253B4307-300%2F250%253B53777200%2F53690477%2F1%253B%253B%257Esscs%253D%253f&amp;clickN=0&amp;assets=HBR1046_Barina_siri_100k_300x250_cs5.swf%253Dhttp%25253A%2F%2Fs0.2mdn.net%2Fads%2Frichmedia%2Fstudio%2F5137851%2F23542767_20130405195219453_HBR1046_Barina_siri_100k_300x250_cs5.swf%2526HBR1046-Barina-Siri_300x250.gif%253Dhttp%25253A%2F%2Fs0.2mdn.net%2Fads%2Frichmedia%2Fstudio%2F5137851%2F23542767_20130327204510164_HBR1046-Barina-Siri_300x250.gif&amp;vcData=&amp;exitEvents=name%253ABackground_Clickthrough%252Curl%253Ahttp%25253A%2F%2Fwww.holden.com.au%2Fvehicles%2Fbarina%2Fapps%25253Futm_source%25253Ddisplay_network%252526utm_medium%25253Dninemsn%252526utm_campaign%25253Dbarina_cdx%252Ctarget%253A_blank%7BDELIM%7Dname%253AFindOutHere_Clickthrough%252Curl%253Ahttp%25253A%2F%2Fwww.holden.com.au%2Fvehicles%2Fbarina%2Fapps%25253Futm_source%25253Ddisplay_network%252526utm_medium%25253Dninemsn%252526utm_campaign%25253Dbarina_cdx%252Ctarget%253A_blank&amp;sn=N7537.125935.NINEMSNAUSTRALIA&amp;sid=1287911&amp;adv=3626350&amp;buy=7568672&amp;pid=97160274&amp;aid=270813777&amp;cid=53777200&amp;rid=53690477&amp;ct=AU&amp;st=&amp;ac=2&amp;zp=&amp;bw=4&amp;dma=1&amp;city=185&amp;br=cr&amp;isFlashFullScreenEnabled=true&amp;td=http%3A%2F%2Fninemsn.com.au&amp;adSiteUrl=http%3A%2F%2Fninemsn.com.au%2F&amp;googleDiscoveryUrl=http%3A%2F%2Fpagead2.googlesyndication.com%2Fpagead%2Fads%3Fclient%3Ddclk-3pas-query%26output%3Dxml%26geo%3Dtrue&amp;dcData=&amp;ispushdown=false&amp;expEnv=basic&amp;" name="FLASH_200_19_flash_inpage_0" id="FLASH_200_19_flash_inpage_0" allowscriptaccess="always" allowfullscreeninteractive="true" allowfullscreen="true" style="outline: none;"></object></div></div>
 
+        <div class="tweet">
+					<div class="profile-image"><img src="https://si0.twimg.com/profile_images/3541063034/7b20c1d2d0cb80a94d464e44070fff2d_bigger.png""></div>
+					<div class="from"><span class="from-user-name">Tweets On a Map</span> <span class="from-user">@@TweetsOnAMap</span></div>
+					<div class="text">@@TweetsOnAMap 2000 3/10 Hello!</div>
+					<div class="meta">7 minutes ago</div>
+				</div>
 
         <div class="navbar">
           <div class="navbar-inner">
@@ -149,20 +210,24 @@
         <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
 
         <script type="text/javascript">
-            (function() {
-                function initialize() {
-                    var mapOptions = {
-                      center: new google.maps.LatLng(-33.855601, 151.20822),
-                        zoom: 12,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP,
-                        streetViewControl: false,
-                        disableDefaultUI: true
-                    };
-                    window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-                }
+            (function () {
+              function initialize() {
+                var mapOptions = {
+                  center: new google.maps.LatLng(-33.855601, 151.20822),
+                  zoom: 12,
+                  mapTypeId: google.maps.MapTypeId.ROADMAP,
+                  streetViewControl: false,
+                  disableDefaultUI: true
+                };
+                window.map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+              }
 
+              $(window).resize(function () {
                 $('#map-canvas').css('height', $(window).height());
-                google.maps.event.addDomListener(window, 'load', initialize);
+              });
+
+              $('#map-canvas').css('height', $(window).height());
+              google.maps.event.addDomListener(window, 'load', initialize);
             })();
         </script>
     </div>
