@@ -47,7 +47,7 @@ $(function () {
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     };
 
-    var twitterTemplate = '<li class="media navbar-inner"><button class="close pull-right">&times;</button><a class="pull-left" href="#"><img class="media-object" src="{imgUrl}"></a><div class="media-body"><a href="">@{name}</a> {tweet} </div></li>';
+    var twitterTemplate = '<li class="media navbar-inner"><button class="close pull-right">&times;</button><a class="pull-left" href="#"><img class="media-object" src="{imgUrl}"></a><div class="media-body"><a href="">@{name}</a><br/>{tweet} </div></li>';
 
     $.extend(ticker.client, {
         updateUserCount: function (users) {
@@ -104,15 +104,15 @@ $(function () {
             }
 
             var infobox = new InfoBox({
-                content: "<div class='infobox-inner'><img style='display: inline; float: left;' src='" + profileImageUrl + "' /><div style='padding-left: 10px;display: inline-block;float: left;'>@" + screenName + "<br />" + text + "</div></div>",
+                content: "<div class='infobox-inner'><img style='display: inline; float: left;' src='" + profileImageUrl + "' /><div style=' width: 230px; padding-left: 10px;display: inline-block;float: left;'>@" + screenName + "<br />" + text + "</div></div>",
                 disableAutoPan: true,
-                maxWidth: 200,
+                maxWidth: 350,
                 pixelOffset: new google.maps.Size(-140, 0),
                 zIndex: null,
                 boxStyle: {
                     background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif') no-repeat",
                     opacity: 0.75,
-                    width: "300px"
+                    width: "350px"
                 },
                 closeBoxMargin: "12px 4px 2px 2px",
                 closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
@@ -142,7 +142,7 @@ $(function () {
 
             setTimeout(function () {
                 infobox.close();
-            }, 3000);
+            }, 8000);
         }
     });
 
