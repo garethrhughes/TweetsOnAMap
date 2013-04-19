@@ -20,9 +20,10 @@ namespace twangman.web.App_Start
 
     public class TwitterClient
     {
-        private static IList<TweetData> AllTweets { get; set; } 
-
+        private static IList<TweetData> AllTweets { get; set; }
+        private static string ScreenName = "TweetsOnAMap";
         private static Task twitterTask;
+
 
         public static void Start ()
         {
@@ -65,7 +66,7 @@ namespace twangman.web.App_Start
                 User = new TwitterUser
                     {
                         ProfileImageUrl = "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
-                        ScreenName = "TweetsOnAMap"
+                        ScreenName = ScreenName
                     },
                 Text = "Something"
             };
@@ -78,8 +79,8 @@ namespace twangman.web.App_Start
                 var randomRating = rand.Next(0, 10);
                 twitterStatus.Text = string.Format("@tweetsonamap {0} {1}/10 Testing", nextPostcode, randomRating);
                 ProcessPostcodeTweet(twitterStatus);
-                ProcessAccountTweet(accountStatus);
-                twitterTask.Wait(5000);
+                //ProcessAccountTweet(accountStatus);
+                twitterTask.Wait(1000);
             }
         }
 
@@ -88,7 +89,7 @@ namespace twangman.web.App_Start
             var status = service.Deserialize<TwitterStatus>(tweets);
             if (status.User != null)
             {
-                if (status.User.ScreenName == "TweetsOnAMap") 
+                if (status.User.ScreenName == ScreenName) 
                     ProcessAccountTweet(status);
                 else
                     ProcessPostcodeTweet(status);
@@ -109,7 +110,7 @@ namespace twangman.web.App_Start
                 var rating = int.Parse(match.Groups[2].Value);
                 var text = match.Groups[3].Value;
                 if (rating > 10) rating = 10;
-                if (rating < 0) rating = 0;
+                if (rating < 1) rating = 1;
 
                 var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
                 
