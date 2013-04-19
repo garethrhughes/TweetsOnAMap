@@ -26,7 +26,7 @@ namespace twangman.web.App_Start
 
         public static void Start ()
         {
-            twitterTask = new Task(Main);
+            twitterTask = new Task(FakeMain);
             AllTweets = new List<TweetData>();
             twitterTask.Start();
         }
@@ -76,7 +76,7 @@ namespace twangman.web.App_Start
             {
                 int nextPostcode = rand.Next(2000, 2100);
                 var randomRating = rand.Next(0, 10);
-                twitterStatus.Text = string.Format("{0} {1}/10 Testing", nextPostcode, randomRating);
+                twitterStatus.Text = string.Format("@tweetsonamap {0} {1}/10 Testing", nextPostcode, randomRating);
                 ProcessPostcodeTweet(twitterStatus);
                 ProcessAccountTweet(accountStatus);
                 twitterTask.Wait(5000);

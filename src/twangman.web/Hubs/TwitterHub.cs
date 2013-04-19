@@ -28,14 +28,14 @@
 
     public override Task OnConnected()
     {
-      _twitterTicker.IncreaseUsers();
+      _twitterTicker.IncreaseUsers(Context.ConnectionId);
 
       return Clients.All.joined(Context.ConnectionId, DateTime.Now.ToString());
     }
 
     public override Task OnDisconnected()
     {
-      _twitterTicker.DecreaseUsers();
+      _twitterTicker.DecreaseUsers(Context.ConnectionId);
 
       return Clients.All.leave(Context.ConnectionId, DateTime.Now.ToString());
     }
@@ -49,6 +49,7 @@
     
     private TwitterTicker(IHubConnectionContext clients)
     {
+      ClientIDs = new List<string>();
       Clients = clients;
     }
 
@@ -68,16 +69,16 @@
 
     public void DecreaseUsers(string id)
     {
-      if(!ClientIDs.Any(x => x == id))
-        ClientIDs.Add(id);
+      if(ClientIDs.Any(x => x == id))
+        ClientIDs.Remove(id);
 
       Clients.All.updateUserCount(UserCount);
     }
 
     public void IncreaseUsers(string id)
     {
-      if (ClientIDs.Any(x => x == id))
-        ClientIDs.Remove(id);
+      if (!ClientIDs.Any(x => x == id))
+        ClientIDs.Add(id);
 
       Clients.All.updateUserCount(UserCount);
     }
