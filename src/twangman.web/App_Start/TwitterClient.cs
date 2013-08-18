@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 
 using twangman.web.App_Start;
@@ -30,7 +32,7 @@ namespace twangman.web.App_Start
 
         public static void Start ()
         {
-            twitterTask = new Task(Main);
+            twitterTask = new Task(FakeMain);
             twitterTask.Start();
         }
 
@@ -46,102 +48,59 @@ namespace twangman.web.App_Start
                 return Disposable.Empty;
             });
 
+            var votesForPostcodes = GetElectorateSummaryStream(statusStream);
+
+            votesForPostcodes.Subscribe(TwitterTicker.Instance.SendElectorateUpdate);
+        }
+
+        private static IObservable<ElectorateSummary> GetElectorateSummaryStream(IObservable<TwitterStatus> statusStream)
+        {
             var votes = statusStream
-                            .Where(t => t.User != null)
-                            .Select(t =>
-                            {
-                                var match = Regex.Match(t.Text, @"@tweetsonamap ([0-9]{3,4}) ([A-Z]{3})", RegexOptions.IgnoreCase);
-                                return new TweetDetails
-                                {
-                                    User = t.User.ScreenName,
-                                    Postcode = match.Groups[1].Value,
-                                    Party = match.Groups[2].Value,
-                                    Status = t
-                                };
-                            });
+                .Where(t => t.User != null)
+                .Select(TweetDetails.FromStatus);
 
-            votes.Subscribe(v => TwitterTicker.Instance.SendPostcode(v));
+            //votes.Subscribe(v => TwitterTicker.Instance.SendPostcode(v));
 
-            //var tweetsByPostcode = votes.GroupBy(t => t.Postcode);
+            var tweetsByPostcode = votes.GroupBy(t => t.Postcode);
 
-            //var votesForPostcodes =
-            //    tweetsByPostcode
-            //        .Select(tweetsForPostcode =>
-            //            tweetsForPostcode.Scan(
-            //                new PostcodeTweetDetails(tweetsForPostcode.Key),
-            //                (ptd, t) => ptd.AddTweet(t)))
-            //        .Merge();
+            var votesForPostcodes =
+                tweetsByPostcode
+                    .Select(tweetsForPostcode =>
+                        tweetsForPostcode.Scan(
+                            new ElectorateSummary(tweetsForPostcode.Key),
+                            (ptd, t) => ptd.AddTweet(t)))
+                    .Merge()
+                    .Do(es => Debug.WriteLine(es));
 
-            //service.StreamUser((tweets, response) =>
-            //{
-            //  if (tweets != null)
-            //  {
-            //    SaveTweet(service, tweets);
-            //  }
-            //});
-
+            return votesForPostcodes;
         }
 
         public static void FakeMain()
         {
-            var twitterStatus = new TwitterStatus
-                {
-                    User =
-                        new TwitterUser
-                            {
-                                ProfileImageUrl =
-                                    "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
-                                ScreenName = "Susan"
-                            }
-                };
-
-            var accountStatus = new TwitterStatus
-            {
-                User = new TwitterUser
-                    {
-                        ProfileImageUrl = "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
-                        ScreenName = TweetsOnAMapScreenName
-                    },
-                Text = "Something"
-            };
-
             var rand = new Random();
 
-            for (int i = 0; i < 1000000; i++ )
-            {
-                int nextPostcode = rand.Next(2000, 2100);
-                var randomRating = rand.Next(0, 10);
-                twitterStatus.Text = string.Format("@tweetsonamap {0} {1}/10 Testing", nextPostcode, randomRating);
-                ProcessPostcodeTweet(twitterStatus);
-                
-                if(i % 10 == 0)
-                    ProcessAccountTweet(accountStatus);
+            var statusStream = Observable.Interval(TimeSpan.FromSeconds(2)).Select(_ =>
+                new TwitterStatus
+                {
+                    User = new TwitterUser
+                    {
+                        ProfileImageUrl =
+                            "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
+                        ScreenName = "Susan"
+                    },
+                    Text = string.Format("@tweetsonamap {0} LIB Testing", rand.Next(2000, 2100))
+                });
 
-                twitterTask.Wait(2000);
-            }
+            var votesForPostcodes = GetElectorateSummaryStream(statusStream);
+            votesForPostcodes.Subscribe(TwitterTicker.Instance.SendElectorateUpdate);
         }
 
-        private static void SaveTweet(TwitterService service, TwitterStreamArtifact tweets)
-        {
-            var status = service.Deserialize<TwitterStatus>(tweets);
-            if (status.User != null)
-            {
-                if (status.User.ScreenName == TweetsOnAMapScreenName) 
-                    ProcessAccountTweet(status);
-                else
-                    ProcessPostcodeTweet(status);
-            }   
-        }
 
         private static void ProcessAccountTweet(TwitterStatus status)
         {
             TwitterTicker.Instance.SendAccountTweet(status.Text, status.User.ScreenName, status.User.ProfileImageUrl);
         }
 
-        private static void ProcessPostcodeTweet(TwitterStatus status)
-        {
-            //TwitterTicker.Instance.SendPostcode(status);
-        }
     }
 
     public class TweetData
@@ -156,9 +115,9 @@ namespace twangman.web.App_Start
     }
 }
 
-internal class PostcodeTweetDetails
+public class ElectorateSummary
 {
-    public PostcodeTweetDetails(string postcode)
+    public ElectorateSummary(string postcode)
     {
         Postcode = postcode;
         VotesByParty = new Dictionary<string, int>();
@@ -168,7 +127,7 @@ internal class PostcodeTweetDetails
     public int TotalVotes { get; set; }
     public IDictionary<string, int> VotesByParty { get; private set; }
 
-    public PostcodeTweetDetails AddTweet(TweetDetails t)
+    public ElectorateSummary AddTweet(TweetDetails t)
     {
         TotalVotes++;
 
@@ -189,6 +148,11 @@ internal class PostcodeTweetDetails
 
 public class TweetDetails
 {
+    private TweetDetails()
+    {
+        
+    }
+
     public string User { get; set; }
     public string Postcode { get; set; }
     public string Party { get; set; }
@@ -197,5 +161,18 @@ public class TweetDetails
     public override string ToString()
     {
         return string.Format("{0} votes {1} in {2}", User, Party, Postcode);
+    }
+
+    public static TweetDetails FromStatus(TwitterStatus status)
+    {
+        var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([A-Z]{3})", RegexOptions.IgnoreCase);
+
+        return new TweetDetails
+        {
+            User = status.User.ScreenName,
+            Postcode = match.Groups[1].Value,
+            Party = match.Groups[2].Value,
+            Status = status
+        };
     }
 }

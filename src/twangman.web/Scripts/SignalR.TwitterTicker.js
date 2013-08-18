@@ -69,6 +69,53 @@ $(function () {
                 });
             }, 180000);
         },
+        displayElectorateUpdate: function (postcode, totalVotes, votesByParty) {
+            console.log(postcode);
+            console.log(totalVotes);
+            if (areas[postcode] == null) {
+                var populationOptions = {
+                    strokeColor: '#000000',
+                    strokeOpacity: 0.3,
+                    strokeWeight: 2,
+                    fillColor: colourMagic(5),
+                    fillOpacity: 0.6,
+                    map: map,
+                    center: new google.maps.LatLng(postcode.Latitude, postcode.Longitude),
+                    radius: size * 100,
+                    clickable: true
+                };
+
+                areas[postcode] = new google.maps.Circle(populationOptions);
+
+                google.maps.event.addListener(areas[postcode], 'click', function (ev) {
+
+                    ticker.server.getPostcodeInfo(postcode).done(function (message) {
+                        var clickBox = createBox(message);
+                        clickBox.open(map, {
+                            getPosition: function () {
+                                return new google.maps.LatLng(postcode.Latitude, postcode.Longitude);
+                            }
+                        });
+                    });
+
+                });
+
+            } else {
+                areas[postcode].setOptions({ radius: size * 100, strokeColor: '#000000', fillColor: colour });
+            }
+
+            var infobox = createBox("<div style=' width: 230px; padding-left: 10px;display: inline-block;float: left;'>Postcode: " + postcode + "<br />Total Votes: " + totalVotes + "</div>");
+
+            infobox.open(map, {
+                getPosition: function () {
+                    return new google.maps.LatLng(lat, lng);
+                }
+            });
+
+            setTimeout(function () {
+                infobox.close();
+            }, 8000);
+        },
         displayPostcode: function (postcodeObj, size, rating, lat, lng, text, screenName, profileImageUrl, count) {
             var postcode = postcodeObj.Code;
             $("#total-tweets").html(count);

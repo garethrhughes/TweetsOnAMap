@@ -12,7 +12,7 @@
 
   using twangman.web.App_Start;
 
-    [HubName("twitterTicker")]
+  [HubName("twitterTicker")]
   public class TwitterHub : Hub
   {
     private readonly TwitterTicker _twitterTicker;
@@ -61,7 +61,7 @@
     private TwitterTicker(IHubConnectionContext clients)
     {
       ClientIDs = new List<string>();
-        AllTweets = new List<TweetData>();
+      AllTweets = new List<TweetData>();
       Clients = clients;
     }
 
@@ -98,45 +98,31 @@
     public void SendPostcode(TweetDetails status)
     {
         var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == int.Parse(status.Postcode));
-        Clients.All.displayPostcode(
-                   postcode,
-                   1,
-                   1,
-                   postcode.Latitude,
-                   postcode.Longitude,
-                   status.Status.Text,
-                   status.Status.User.ScreenName,
-                   status.Status.User.ProfileImageUrl,
-                   AllTweets.Count);
 
-        //var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([A-Z]{3})", RegexOptions.IgnoreCase);
-        //if (match.Success)
-        //{
-        //    var code = int.Parse(match.Groups[1].Value);
-        //    var party = match.Groups[2].Value;
-            
-        //    var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
-
-        //    if (postcode != null)
-        //    {
-        //        AllTweets.Add(new TweetData { Code = code, Rating = 1, Tweet = status.Text, Party = party });
-
-        //        var size = AllTweets.Count(x => x.Code == code);
-        //        var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
-
-        //        Clients.All.displayPostcode(
-        //            postcode,
-        //            size,
-        //            averageRating,
-        //            postcode.Latitude,
-        //            postcode.Longitude,
-        //            status.Text,
-        //            status.User.ScreenName,
-        //            status.User.ProfileImageUrl,
-        //            AllTweets.Count);
-        //    }
-        //}
+        if (postcode != null)
+        {
+            Clients.All.displayPostcode(
+                postcode,
+                1,
+                1,
+                postcode.Latitude,
+                postcode.Longitude,
+                status.Status.Text,
+                status.Status.User.ScreenName,
+                status.Status.User.ProfileImageUrl,
+                AllTweets.Count);
+        }
     }
+
+      public void SendElectorateUpdate(ElectorateSummary summary)
+      {
+          var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == int.Parse(summary.Postcode));
+
+          if (postcode != null)
+          {
+              Clients.All.displayElectorateUpdate(postcode, summary.TotalVotes, summary.VotesByParty);
+          }
+      }
 
       public void SendAccountTweet(string text, string screenName, string profileImageUrl)
       {
