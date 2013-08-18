@@ -95,37 +95,47 @@
       Clients.All.updateUserCount(UserCount);
     }
 
-    public void SendPostcode(TwitterStatus status)
+    public void SendPostcode(TweetDetails status)
     {
-        var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([0-9]{1,2})\/10", RegexOptions.IgnoreCase);
-        if (match.Success)
-        {
-            var code = int.Parse(match.Groups[1].Value);
-            var rating = int.Parse(match.Groups[2].Value);
-            if (rating > 10) rating = 10;
-            if (rating < 1) rating = 1;
+        var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == int.Parse(status.Postcode));
+        Clients.All.displayPostcode(
+                   postcode,
+                   1,
+                   1,
+                   postcode.Latitude,
+                   postcode.Longitude,
+                   status.Status.Text,
+                   status.Status.User.ScreenName,
+                   status.Status.User.ProfileImageUrl,
+                   AllTweets.Count);
 
-            var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
+        //var match = Regex.Match(status.Text, @"@tweetsonamap ([0-9]{3,4}) ([A-Z]{3})", RegexOptions.IgnoreCase);
+        //if (match.Success)
+        //{
+        //    var code = int.Parse(match.Groups[1].Value);
+        //    var party = match.Groups[2].Value;
+            
+        //    var postcode = PostcodeLoader.Postcodes.FirstOrDefault(x => x.Code == code);
 
-            if (postcode != null)
-            {
-                AllTweets.Add(new TweetData { Code = code, Rating = rating, Tweet = status.Text });
+        //    if (postcode != null)
+        //    {
+        //        AllTweets.Add(new TweetData { Code = code, Rating = 1, Tweet = status.Text, Party = party });
 
-                var size = AllTweets.Count(x => x.Code == code);
-                var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
+        //        var size = AllTweets.Count(x => x.Code == code);
+        //        var averageRating = AllTweets.Where(x => x.Code == code).Average(x => x.Rating);
 
-                Clients.All.displayPostcode(
-                    postcode,
-                    size,
-                    averageRating,
-                    postcode.Latitude,
-                    postcode.Longitude,
-                    status.Text,
-                    status.User.ScreenName,
-                    status.User.ProfileImageUrl,
-                    AllTweets.Count);
-            }
-        }
+        //        Clients.All.displayPostcode(
+        //            postcode,
+        //            size,
+        //            averageRating,
+        //            postcode.Latitude,
+        //            postcode.Longitude,
+        //            status.Text,
+        //            status.User.ScreenName,
+        //            status.User.ProfileImageUrl,
+        //            AllTweets.Count);
+        //    }
+        //}
     }
 
       public void SendAccountTweet(string text, string screenName, string profileImageUrl)

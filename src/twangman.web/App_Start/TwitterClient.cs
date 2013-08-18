@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Web;
 
 using twangman.web.App_Start;
+using TweetSharp;
 
 [assembly: WebActivatorEx.PostApplicationStartMethod(typeof(TwitterClient), "Start")]
 
@@ -21,7 +24,7 @@ namespace twangman.web.App_Start
     public class TwitterClient
     {
         
-        private static string ScreenName = "TweetsOnAMap";
+        private static string TweetsOnAMapScreenName = "TweetsOnAMap";
         private static Task twitterTask;
 
 
@@ -35,15 +38,47 @@ namespace twangman.web.App_Start
         {
             var service = new TwitterService(Authentication.ConsumerKey, Authentication.ConsumerSecret);
             service.AuthenticateWith(Authentication.AccessToken, Authentication.AccessTokenSecret);
-            
 
-            service.StreamUser((tweets, response) =>
+            var statusStream = Observable.Create<TwitterStatus>(observer =>
             {
-              if (tweets != null)
-              {
-                SaveTweet(service, tweets);
-              }
+                service.StreamUser((tweets, response) => observer.OnNext(service.Deserialize<TwitterStatus>(tweets)));
+
+                return Disposable.Empty;
             });
+
+            var votes = statusStream
+                            .Where(t => t.User != null)
+                            .Select(t =>
+                            {
+                                var match = Regex.Match(t.Text, @"@tweetsonamap ([0-9]{3,4}) ([A-Z]{3})", RegexOptions.IgnoreCase);
+                                return new TweetDetails
+                                {
+                                    User = t.User.ScreenName,
+                                    Postcode = match.Groups[1].Value,
+                                    Party = match.Groups[2].Value,
+                                    Status = t
+                                };
+                            });
+
+            votes.Subscribe(v => TwitterTicker.Instance.SendPostcode(v));
+
+            //var tweetsByPostcode = votes.GroupBy(t => t.Postcode);
+
+            //var votesForPostcodes =
+            //    tweetsByPostcode
+            //        .Select(tweetsForPostcode =>
+            //            tweetsForPostcode.Scan(
+            //                new PostcodeTweetDetails(tweetsForPostcode.Key),
+            //                (ptd, t) => ptd.AddTweet(t)))
+            //        .Merge();
+
+            //service.StreamUser((tweets, response) =>
+            //{
+            //  if (tweets != null)
+            //  {
+            //    SaveTweet(service, tweets);
+            //  }
+            //});
 
         }
 
@@ -65,7 +100,7 @@ namespace twangman.web.App_Start
                 User = new TwitterUser
                     {
                         ProfileImageUrl = "https://si0.twimg.com/sticky/default_profile_images/default_profile_2_normal.png",
-                        ScreenName = ScreenName
+                        ScreenName = TweetsOnAMapScreenName
                     },
                 Text = "Something"
             };
@@ -91,7 +126,7 @@ namespace twangman.web.App_Start
             var status = service.Deserialize<TwitterStatus>(tweets);
             if (status.User != null)
             {
-                if (status.User.ScreenName == ScreenName) 
+                if (status.User.ScreenName == TweetsOnAMapScreenName) 
                     ProcessAccountTweet(status);
                 else
                     ProcessPostcodeTweet(status);
@@ -105,8 +140,7 @@ namespace twangman.web.App_Start
 
         private static void ProcessPostcodeTweet(TwitterStatus status)
         {
-            
-            TwitterTicker.Instance.SendPostcode(status);
+            //TwitterTicker.Instance.SendPostcode(status);
         }
     }
 
@@ -117,5 +151,51 @@ namespace twangman.web.App_Start
         public int Rating { get; set; }
 
         public string Tweet { get; set; }
+
+        public string Party { get; set; }
+    }
+}
+
+internal class PostcodeTweetDetails
+{
+    public PostcodeTweetDetails(string postcode)
+    {
+        Postcode = postcode;
+        VotesByParty = new Dictionary<string, int>();
+    }
+
+    public string Postcode { get; set; }
+    public int TotalVotes { get; set; }
+    public IDictionary<string, int> VotesByParty { get; private set; }
+
+    public PostcodeTweetDetails AddTweet(TweetDetails t)
+    {
+        TotalVotes++;
+
+        if (!VotesByParty.ContainsKey(t.Party))
+            VotesByParty[t.Party] = 1;
+        else
+            VotesByParty[t.Party]++;
+
+        return this;
+    }
+
+    public override string ToString()
+    {
+        var votesByParty = VotesByParty.Select(kvp => string.Format("{0}: {1}", kvp.Key, kvp.Value));
+        return string.Format("{0} total votes {1} - {2}", Postcode, TotalVotes, string.Join(", ", votesByParty));
+    }
+}
+
+public class TweetDetails
+{
+    public string User { get; set; }
+    public string Postcode { get; set; }
+    public string Party { get; set; }
+    public TwitterStatus Status { get; set; }
+
+    public override string ToString()
+    {
+        return string.Format("{0} votes {1} in {2}", User, Party, Postcode);
     }
 }
