@@ -69,10 +69,8 @@ $(function () {
                 });
             }, 180000);
         },
-        displayElectorateUpdate: function (postcode, totalVotes, votesByParty) {
-            console.log(postcode);
-            console.log(totalVotes);
-            if (areas[postcode] == null) {
+        displayElectorateUpdate: function (postcode, totalVotes, votesByParty, size) {
+            if (areas[postcode.Code] == null) {
                 var populationOptions = {
                     strokeColor: '#000000',
                     strokeOpacity: 0.3,
@@ -85,11 +83,11 @@ $(function () {
                     clickable: true
                 };
 
-                areas[postcode] = new google.maps.Circle(populationOptions);
+                areas[postcode.Code] = new google.maps.Circle(populationOptions);
 
-                google.maps.event.addListener(areas[postcode], 'click', function (ev) {
+                google.maps.event.addListener(areas[postcode.Code], 'click', function (ev) {
 
-                    ticker.server.getPostcodeInfo(postcode).done(function (message) {
+                    ticker.server.getPostcodeInfo(postcode.Code).done(function (message) {
                         var clickBox = createBox(message);
                         clickBox.open(map, {
                             getPosition: function () {
@@ -101,14 +99,14 @@ $(function () {
                 });
 
             } else {
-                areas[postcode].setOptions({ radius: size * 100, strokeColor: '#000000', fillColor: colour });
+                areas[postcode.Code].setOptions({ radius: size * 100, strokeColor: '#000000', fillColor: '#888888' });
             }
 
-            var infobox = createBox("<div style=' width: 230px; padding-left: 10px;display: inline-block;float: left;'>Postcode: " + postcode + "<br />Total Votes: " + totalVotes + "</div>");
+            var infobox = createBox("<div style=' width: 230px; padding-left: 10px;display: inline-block;float: left;'>Postcode: " + postcode.Code + "<br />Total Votes: " + totalVotes + "</div>");
 
             infobox.open(map, {
                 getPosition: function () {
-                    return new google.maps.LatLng(lat, lng);
+                    return new google.maps.LatLng(postcode.Latitude, postcode.Longitude);
                 }
             });
 

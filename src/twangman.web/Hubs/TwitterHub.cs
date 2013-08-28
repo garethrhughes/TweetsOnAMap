@@ -120,7 +120,7 @@
 
           if (postcode != null)
           {
-              Clients.All.displayElectorateUpdate(postcode, summary.TotalVotes, summary.VotesByParty);
+              Clients.All.displayElectorateUpdate(postcode, summary.TotalVotes, summary.VotesByParty, 1);
           }
       }
 
